@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @section('title', 'Ajouter une catégorie')
+
 @section('content')
 <div class="col-md-6 offset-md-3">
     <div class="card mt-5 shadow">
