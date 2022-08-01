@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
+use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class PostController extends Controller
 {
@@ -13,7 +16,8 @@ class PostController extends Controller
      */
     public function index()
     {
-        return view('posts.index');
+        $posts = Post::all();
+        return view('posts.index',compact('posts'));
     }
 
     /**
@@ -23,7 +27,8 @@ class PostController extends Controller
      */
     public function create()
     {
-        //
+        $categories = Category::all();
+        return view('posts.create', compact('categories'));
     }
 
     /**
@@ -34,9 +39,26 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        //
-    }
+        $request->validate([
+            'title' => 'required|min:3',
+            'image' => 'required|mimes:png,jpg',
+            'content' => 'required',
+            'category_id' => 'required|integer'
+        ], [
+            'title.required' => 'Le champ titre est obligatoire',
+            'title.min' => 'Le champ titre doit contenir minimum 3 caractères'
+        ]);
 
+        $post = new Post();
+        $post->title = $request->title;
+        $post->content = $request->content;
+        $post->category_id = $request->category_id;
+        $post->image = $request->file('image')->store('images/posts');
+        $post->slug = Str::slug($request->title);
+        $post->save();
+
+        return redirect()->route('post.index');
+    }
     /**
      * Display the specified resource.
      *
